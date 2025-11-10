@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ShopEasy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body { font-family: Arial; margin: 0; padding: 0; background: #f2f7ff; }
+
+        .navbar { background: #004aad; padding: 10px; }
+        .navbar a { color: white; padding: 10px; text-decoration: none; display: inline-block; }
+        .navbar a:hover { background: #007bff; }
+
+        .hero { padding: 20px; background: #cfe2ff; text-align: center; }
+
+        .products { display: flex; flex-wrap: wrap; gap: 15px; padding: 20px; }
+        .card { width: 250px; border: 1px solid #ccc; padding: 10px; background: white; border-radius: 5px; }
+        .card img { width: 100%; height: 180px; object-fit: cover; }
+
+        .forms { padding: 20px; background: #e6f0ff; }
+        input { width: 100%; padding: 8px; margin: 5px 0; border-radius: 4px; border: 1px solid #999; }
+        button { padding: 8px 15px; margin-top: 10px; background: #004aad; color: white; border: none; cursor: pointer; }
+        button:hover { background: #007bff; }
+
+        .section { padding: 20px; border-top: 1px solid #ddd; }
+
+        #cartBox { background: white; padding: 10px; border: 1px solid #ccc; margin: 20px; }
+        #checkoutBox { background: #fff; padding: 15px; border: 1px solid #ccc; margin: 20px; }
+
+        @media (max-width: 600px) {
+            .products { flex-direction: column; }
+            .card { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="#home">Home</a>
+        <a href="#products">Products</a>
+        <a href="#contact">Contact Us</a>
+        <a href="#about">About Us</a>
+    </div>
+
+    <div id="home" class="hero">
+        <h1>Welcome to ShopEasy</h1>
+        <p>Website where you can buy Quality Products </p>
+    </div>
+
+    <div id="cartBox">
+        <h3>Shopping Cart</h3>
+        <ul id="cartList"></ul>
+        <p><strong>Total:</strong> ₹<span id="totalAmount">0</span></p>
+        <button onclick="openCheckout()">Proceed to Checkout</button>
+    </div>
+
+    <div id="checkoutBox" style="display:none;">
+        <h2>Checkout Page</h2>
+        <p>Enter your details to complete the purchase:</p>
+        <input id="chkName" type="text" placeholder="Full Name">
+        <input id="chkAddress" type="text" placeholder="Address">
+        <input id="chkPhone" type="text" placeholder="Phone Number">
+        <button onclick="placeOrder()">Place Order</button>
+        <p id="orderMsg" style="color:green"></p>
+    </div>
+
+    <div id="products" class="section">
+        <h2>Products</h2>
+        <div class="products">
+
+            <div class="card">
+                <img src="https://th.bing.com/th/id/R.395b06350cefe1fe9d147b642fa3878a?rik=1rR3%2fAwPC%2fC6pA&riu=http%3a%2f%2fthesafaricollective.com%2fcdn%2fshop%2ffiles%2fa48716cd3d060ff5be3e257b64008a19b1e81e0819a111b3a44818a527f3f226.jpg%3fv%3d1703963479&ehk=3lU8zYabLXGWR9jZOGPwRXDkovxkfdJ5CtQl6QiHtmk%3d&risl=&pid=ImgRaw&r=0">
+                <h3>Mountain Book</h3>
+                <p>Price: ₹399</p>
+                <button onclick="addToCart('Mountain Book',399)">Add to Cart</button>
+            </div>
+
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=400&q=60">
+                <h3>Polaroid Camera</h3>
+                <p>Price: ₹11499</p>
+                <button onclick="addToCart('Polaroid Camera',11499)">Add to Cart</button>
+            </div>
+
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1585386959984-a4155224a1ad?auto=format&fit=crop&w=400&q=60">
+                <h3>Perfume</h3>
+                <p>Price: ₹1999</p>
+                <button onclick="addToCart('Perfume',1999)">Add to Cart</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="login" class="section forms">
+        <h2>Login</h2>
+        <input id="loginEmail" type="email" placeholder="Email">
+        <input id="loginPass" type="password" placeholder="Password">
+        <button onclick="validateLogin()">Login</button>
+        <p id="loginError" style="color:red"></p>
+    </div>
+
+
+    <div id="register" class="section forms">
+        <h2>User Registration</h2>
+        <input id="regName" type="text" placeholder="Full Name">
+        <input id="regEmail" type="email" placeholder="Email">
+        <input id="regPass" type="password" placeholder="Password">
+        <input id="regPass2" type="password" placeholder="Confirm Password">
+        <button onclick="validateRegister()">Register</button>
+        <p id="regError" style="color:red"></p>
+    </div>
+
+
+    <div id="contact" class="section">
+        <h2>Contact Us</h2>
+        <p>Email: ShopEasy@gmail.com</p>
+        <p>Phone: +91 9876543210</p>
+    </div>
+
+    <div id="about" class="section">
+        <h2>About Us</h2>
+        <p>We are from Tamilnadu and we Give Quality Products to Our Customers Over 2 years.</p>
+    </div>
+
+
+    <script>
+        let cart = [];
+        let total = 0;
+
+        function addToCart(name, price) {
+            cart.push(name + " - ₹" + price);
+            total += price;
+            updateCart();
+        }
+
+        function updateCart() {
+            let list = document.getElementById("cartList");
+            list.innerHTML = "";
+
+            cart.forEach(function(item){
+                let li = document.createElement("li");
+                li.innerText = item;
+                list.appendChild(li);
+            });
+
+            document.getElementById("totalAmount").innerText = total;
+        }
+
+        // SHOW CHECKOUT PAGE
+        function openCheckout() {
+            if(cart.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
+            document.getElementById("checkoutBox").style.display = "block";
+        }
+
+        // PLACE ORDER
+        function placeOrder() {
+            let name = document.getElementById("chkName").value;
+            let address = document.getElementById("chkAddress").value;
+            let phone = document.getElementById("chkPhone").value;
+
+            if(name === "" || address === "" || phone === "") {
+                document.getElementById("orderMsg").style.color = "red";
+                document.getElementById("orderMsg").innerText = "All fields are required!";
+                return;
+            }
+
+            document.getElementById("orderMsg").style.color = "green";
+            document.getElementById("orderMsg").innerText = "Order Placed Successfully!";
+        }
+
+        // LOGIN VALIDATION
+        function validateLogin() {
+            let email = document.getElementById("loginEmail").value;
+            let pass = document.getElementById("loginPass").value;
+
+            if(email === "" || pass === "") {
+                document.getElementById("loginError").innerText = "All fields are required!";
+                return;
+            }
+
+            if(!email.includes("@")) {
+                document.getElementById("loginError").innerText = "Invalid email format!";
+                return;
+            }
+
+            document.getElementById("loginError").innerText = "Login Successful!";
+        }
+
+        function validateRegister() {
+            let name = document.getElementById("regName").value;
+            let email = document.getElementById("regEmail").value;
+            let pass = document.getElementById("regPass").value;
+            let pass2 = document.getElementById("regPass2").value;
+
+            if(name === "" || email === "" || pass === "" || pass2 === "") {
+                document.getElementById("regError").innerText = "All fields must be filled!";
+                return;
+            }
+
+            if(pass.length < 6) {
+                document.getElementById("regError").innerText = "Password must be at least 6 characters!";
+                return;
+            }
+
+            if(pass !== pass2) {
+                document.getElementById("regError").innerText = "Passwords do not match!";
+                return;
+            }
+
+            document.getElementById("regError").innerText = "Registration Successful!";
+        }
+
+    </script>
+
+</body>
+</html>
